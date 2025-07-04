@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap');
+@import "tailwindcss";
+
+body {
+  @apply bg-gradient-to-br from-[#181a20] via-[#23243a] to-[#1a1a2e] min-h-screen text-gray-100 font-sans;
+  font-family: 'Cinzel', 'Merriweather', 'serif', system-ui, sans-serif;
+}
+
+h1, h2, h3 {
+  @apply font-bold text-yellow-300 drop-shadow-lg;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 8px #f6e27a, 0 0 2px #fff;
+}
+
+.mmorp-card {
+  @apply rounded-xl border-4 shadow-2xl p-6 mb-6 bg-gradient-to-br from-[#23243a] to-[#181a20];
+  border-color: #bfa046;
+  box-shadow: 0 0 24px #bfa04644, 0 2px 8px #000a;
+}
+
+.mmorp-btn {
+  @apply px-6 py-2 rounded-lg font-bold text-lg transition-all duration-200 shadow-md;
+  background: linear-gradient(90deg, #bfa046 0%, #f6e27a 100%);
+  color: #23243a;
+  border: 2px solid #bfa046;
+  text-shadow: 0 1px 0 #fff8;
+}
+.mmorp-btn:hover {
+  background: linear-gradient(90deg, #f6e27a 0%, #bfa046 100%);
+  color: #181a20;
+  box-shadow: 0 0 12px #f6e27a88;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  background: #23243a;
+}
+::-webkit-scrollbar-thumb {
+  background: #bfa046;
+  border-radius: 8px;
+}
+
+.wow-btn {
+  font-family: 'Cinzel', serif;
+  @apply text-lg font-bold px-6 py-3 rounded-xl border-4 border-yellow-600 bg-gradient-to-br from-[#23243a] to-[#1a2340] text-yellow-200 shadow-lg transition-all duration-150 outline-none;
+}
+.wow-btn:hover, .wow-btn:focus {
+  @apply border-yellow-400 text-yellow-100 bg-yellow-700/30 shadow-yellow-400/40 shadow-xl;
+  }
+.wow-btn:active {
+  @apply bg-yellow-900/60 border-yellow-700;
+}
