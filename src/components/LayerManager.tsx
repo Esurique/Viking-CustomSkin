@@ -34,8 +34,8 @@ const options: Record<string, { id: string; label: string; img: string }[]> = {
 };
 
 const LayerManager: React.FC = () => {
-  const [activeCat, setActiveCat] = useState(categories[0].key);
-  const { baseModel, setBaseModel, layers, setLayer } = useSkinStore();
+  const [activeCat] = useState(categories[0].key);
+  const { layers, setLayer } = useSkinStore();
 
   // Gestion sélection selon catégorie
   const handleSelect = (cat: string, id: string) => {

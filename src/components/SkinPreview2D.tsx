@@ -24,7 +24,7 @@ const vetementAssets = import.meta.glob('../assets/vetement/*.png', { eager: tru
 const accessoireAssets = import.meta.glob('../assets/accessoire/*.png', { eager: true, import: 'default', query: '?url' });
 
 function assetsToOptions(obj: Record<string, unknown>, label: string) {
-  return Object.entries(obj).map(([path, url], idx) => ({
+  return Object.entries(obj).map(([_, url], idx) => ({
     id: `${label}${idx+1}`,
     label: `${label.charAt(0).toUpperCase() + label.slice(1)} ${idx+1}`,
     img: url as string
@@ -65,7 +65,7 @@ tempCanvas.width = 256;
 tempCanvas.height = 256;
 
 // Fonction utilitaire pour choisir le mode de fusion avancé supporté
-function getSupportedBlendMode(ctx: CanvasRenderingContext2D, preferred: string, fallback: string) {
+function getSupportedBlendMode(ctx: CanvasRenderingContext2D, preferred: GlobalCompositeOperation, fallback: GlobalCompositeOperation): GlobalCompositeOperation {
   ctx.save();
   ctx.globalCompositeOperation = preferred;
   const isSupported = ctx.globalCompositeOperation === preferred;
@@ -82,7 +82,6 @@ const SkinPreview2D: React.FC = () => {
     if (!ctx) return;
 
     // Taille du skin Minecraft HD
-    const size = 256;
     ctx.clearRect(0, 0, 256, 256);
     ctx.globalCompositeOperation = "source-over" as GlobalCompositeOperation;
 
@@ -90,9 +89,10 @@ const SkinPreview2D: React.FC = () => {
     const blendMode = getSupportedBlendMode(ctx, "overlay", "multiply") as GlobalCompositeOperation;
 
     // 1. Dessiner steve.png comme base (en HD si dispo, sinon upscalé)
+    const steveUrl = new URL('../assets/steve.png', import.meta.url).href;
     const baseSkin = imageCache['steve'] || new window.Image();
     if (!imageCache['steve']) {
-      baseSkin.src = "/assets/steve.png";
+      baseSkin.src = steveUrl;
       imageCache['steve'] = baseSkin;
     }
     baseSkin.onload = () => {

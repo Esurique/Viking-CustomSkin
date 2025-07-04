@@ -1,9 +1,6 @@
 import React, { useState } from "react";
-import LayerManager from "./LayerManager";
-import ColorCustomizer from "./ColorCustomizer";
 import SkinPreview2D from "./SkinPreview2D";
 import SkinPreview3D from "./SkinPreview3D";
-import ExportManager from "./ExportManager";
 import { useSkinStore } from "../store/skinStore";
 
 // Nouvelle liste de catégories et mapping pour variantes et couleurs
@@ -54,7 +51,7 @@ yeuxVariants.forEach(variant => {
 });
 
 function assetsToOptions(obj: Record<string, unknown>, label: string) {
-  return Object.entries(obj).map(([path, url], idx) => ({
+  return Object.entries(obj).map(([_, url], idx) => ({
     id: `${label}${idx+1}`,
     label: `${label.charAt(0).toUpperCase() + label.slice(1)} ${idx+1}`,
     img: url as string
@@ -99,7 +96,6 @@ const WoWVariantSelector = () => {
   const [openPicker, setOpenPicker] = useState<string | null>(null);
   const [tempColor, setTempColor] = useState<string>("");
   const [fadeKey, setFadeKey] = useState(0); // pour l'animation de fondu
-  const [forceUpdateKey, setForceUpdateKey] = useState(0); // pour forcer le render 2D/3D
   const [openCategory, setOpenCategory] = useState<string | null>(CATEGORIES[0].key);
 
   // Animation utilitaire
@@ -178,7 +174,6 @@ const WoWVariantSelector = () => {
                       if (!opts[newIdx]) newIdx = 0;
                       setLayer(opts[newIdx].id, partIdx);
                       setFadeKey(fadeKey + 1);
-                      setForceUpdateKey(k => k + 1);
                     };
                     const next = () => {
                       if (!opts.length) return;
@@ -187,7 +182,6 @@ const WoWVariantSelector = () => {
                       if (!opts[newIdx]) newIdx = 0;
                       setLayer(opts[newIdx].id, partIdx);
                       setFadeKey(fadeKey + 1);
-                      setForceUpdateKey(k => k + 1);
                     };
                     return (
                       <div key={part.key} className="w-full mb-2 px-2 pt-2 border-b border-yellow-900 last:border-b-0">

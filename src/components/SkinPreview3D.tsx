@@ -8,7 +8,6 @@ const SkinPreview3D: React.FC = () => {
 
   // Création unique du viewer
   useEffect(() => {
-    let disposed = false;
     let viewer: any = null;
     import("skinview3d").then((skinview3d) => {
       if (!ref.current) return;
@@ -26,7 +25,6 @@ const SkinPreview3D: React.FC = () => {
       }
     });
     return () => {
-      disposed = true;
       if (viewerRef.current) {
         viewerRef.current.dispose();
         viewerRef.current = null;
