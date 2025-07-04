@@ -1,69 +1,73 @@
-# React + TypeScript + Vite
+# Viking CustomSkin
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Un éditeur de skins Minecraft moderne, développé en React + Vite, avec aperçu 2D/3D, colorisation avancée et gestion dynamique des assets (corps, cheveux, yeux, nez, bouche, vêtements, accessoires).
 
-Currently, two official plugins are available:
+## Fonctionnalités principales
+- **Aperçu 2D et 3D** du skin en temps réel (canvas 2D + skinview3d)
+- **Customisation avancée** : couleurs, carrousels d'assets, color pickers
+- **Gestion dynamique des assets** (import.meta.glob)
+- **Colorisation avancée** (modes de fusion overlay/multiply, masquage alpha)
+- **Téléchargement du skin** (PNG)
+- **Interface moderne** (sidebar animée, UX soignée)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Installation
 
-## Expanding the ESLint configuration
+```bash
+# Clone le repo
+git clone https://github.com/Esurique/Viking-CustomSkin.git
+cd Viking-CustomSkin
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Installe les dépendances
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Développement local
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+Ouvre [http://localhost:5173](http://localhost:5173) dans ton navigateur.
+
+## Build production
+
+```bash
+npm run build
+```
+
+## Déploiement sur GitHub Pages
+
+1. Mets à jour le champ `base` dans `vite.config.ts` :
+   ```js
+   base: '/Viking-CustomSkin/',
+   ```
+2. Installe gh-pages si besoin :
+   ```bash
+   npm install --save-dev gh-pages
+   ```
+3. Déploie :
+   ```bash
+   npm run deploy
+   ```
+4. Active GitHub Pages sur la branche `gh-pages` dans les settings du repo.
+
+## Structure du projet
+
+- `src/` : code source React/TypeScript
+- `src/assets/` : images et assets du skin
+- `public/` : fichiers statiques éventuels
+- `dist/` : build de production (ignoré par git)
+
+## Stack technique
+- React 19 + Vite
+- TypeScript
+- Zustand (state)
+- skinview3d (aperçu 3D)
+- TailwindCSS
+
+## Auteur
+- [Esurique](https://github.com/Esurique)
+
+---
+
+> Projet open-source, contributions bienvenues !
