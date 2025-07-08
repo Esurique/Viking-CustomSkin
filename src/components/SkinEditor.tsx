@@ -377,7 +377,7 @@ const WoWVariantSelector = () => {
             style={{width: 'fit-content'}}
           >
             <img
-              src="/assets/blanc_2.0.png"
+              src="https://image.noelshack.com/fichiers/2025/28/2/1751965977-blanc-2-0.png"
               alt="Logo VikingRP"
               style={{height: 144, width: 'auto', maxWidth: '100%'}}
               className="mx-auto drop-shadow-lg transition-transform duration-300 hover:-translate-y-1 hover:scale-105 logo-shine"

@@ -1,73 +1,94 @@
-# Viking CustomSkin
+# CustomSkin
 
-Un éditeur de skins Minecraft moderne, développé en React + Vite, avec aperçu 2D/3D, colorisation avancée et gestion dynamique des assets (corps, cheveux, yeux, nez, bouche, vêtements, accessoires).
+Un éditeur de skin Minecraft moderne, rapide et personnalisable, développé avec React et Vite.
 
-## Fonctionnalités principales
-- **Aperçu 2D et 3D** du skin en temps réel (canvas 2D + skinview3d)
-- **Customisation avancée** : couleurs, carrousels d'assets, color pickers
-- **Gestion dynamique des assets** (import.meta.glob)
-- **Colorisation avancée** (modes de fusion overlay/multiply, masquage alpha)
-- **Téléchargement du skin** (PNG)
-- **Interface moderne** (sidebar animée, UX soignée)
+## ✨ Fonctionnalités
+- **Aperçu 2D et 3D** du skin en temps réel
+- Sélection et superposition d'assets (corps, cheveux, yeux, vêtements, accessoires...)
+- Colorisation avancée de chaque partie
+- Export du skin en PNG ou JSON
+- Déploiement facile sur GitHub Pages
 
-## Installation
+---
 
-```bash
-# Clone le repo
-git clone https://github.com/Esurique/Viking-CustomSkin.git
-cd Viking-CustomSkin
+## 🚀 Installation
 
-# Installe les dépendances
-npm install
-```
+1. **Cloner le repo**
+   ```bash
+   git clone https://github.com/<ton-utilisateur>/<nom-du-repo>.git
+   cd <nom-du-repo>
+   ```
+2. **Installer les dépendances**
+   ```bash
+   npm install
+   ```
 
-## Développement local
+---
+
+## 🛠️ Développement local
 
 ```bash
 npm run dev
 ```
+Le site sera accessible sur [http://localhost:5173](http://localhost:5173)
 
-Ouvre [http://localhost:5173](http://localhost:5173) dans ton navigateur.
+---
 
-## Build production
+## 🏗️ Build (production)
 
 ```bash
 npm run build
 ```
-
-## Déploiement sur GitHub Pages
-
-1. Mets à jour le champ `base` dans `vite.config.ts` :
-   ```js
-   base: '/Viking-CustomSkin/',
-   ```
-2. Installe gh-pages si besoin :
-   ```bash
-   npm install --save-dev gh-pages
-   ```
-3. Déploie :
-   ```bash
-   npm run deploy
-   ```
-4. Active GitHub Pages sur la branche `gh-pages` dans les settings du repo.
-
-## Structure du projet
-
-- `src/` : code source React/TypeScript
-- `src/assets/` : images et assets du skin
-- `public/` : fichiers statiques éventuels
-- `dist/` : build de production (ignoré par git)
-
-## Stack technique
-- React 19 + Vite
-- TypeScript
-- Zustand (state)
-- skinview3d (aperçu 3D)
-- TailwindCSS
-
-## Auteur
-- [Esurique](https://github.com/Esurique)
+Les fichiers statiques seront générés dans le dossier `dist/`.
 
 ---
 
-> Projet open-source, contributions bienvenues !
+## 🌐 Déploiement sur GitHub Pages
+
+1. **Configurer le chemin de base dans `vite.config.js`**
+   ```js
+   export default {
+     base: '/<nom-du-repo>/',
+   }
+   ```
+2. **Installer gh-pages** (si besoin)
+   ```bash
+   npm install --save-dev gh-pages
+   ```
+3. **Ajouter le script de déploiement dans `package.json`**
+   ```json
+   "scripts": {
+     "deploy": "gh-pages -d dist"
+   }
+   ```
+4. **Déployer**
+   ```bash
+   npm run deploy
+   ```
+5. **Activer GitHub Pages** dans les paramètres du repo (branche `gh-pages`)
+
+---
+
+## 📁 Structure du projet
+
+```
+src/
+  components/      # Composants React (2D, 3D, éditeur...)
+  assets/          # Images et assets graphiques
+  store/           # State management (Zustand)
+  ...
+```
+
+---
+
+## 🙏 Remerciements
+- [skinview3d](https://github.com/bs-community/skinview3d) pour le rendu 3D Minecraft
+
+---
+
+## 👤 Auteur
+
+Développé par **Esurique**
+
+---
+

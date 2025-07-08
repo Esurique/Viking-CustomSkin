@@ -3,10 +3,12 @@ import { useSkinStore } from "../store/skinStore";
 
 // Parties personnalisables (à adapter selon assets)
 const parts = [
-  { key: "hair", label: "Cheveux" },
-  { key: "eyes", label: "Yeux" },
+  { key: "hairs", label: "Cheveux" },
+  { key: "eyes_paupiere", label: "Paupière" },
+  { key: "eyes_blanc", label: "Blanc de l'œil" },
+  { key: "eyes_pupille", label: "Pupille" },
   { key: "clothes", label: "Vêtements" },
-  { key: "accessory", label: "Accessoire" },
+  { key: "accessories", label: "Accessoire" },
 ];
 
 // Palette de couleurs prédéfinies (exemple)

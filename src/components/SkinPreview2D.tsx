@@ -59,7 +59,6 @@ const partOptions: Record<string, { id: string; label: string; img: string }[]> 
   accessories: assetsToOptions(accessoireAssets, 'accessoire'),
 };
 
-const imageCache: Record<string, HTMLImageElement> = {};
 let tempCanvas: HTMLCanvasElement = document.createElement('canvas');
 tempCanvas.width = 256;
 tempCanvas.height = 256;
@@ -124,7 +123,27 @@ const SkinPreview2D: React.FC = () => {
         if (part.key === 'body') return;
         const img = imageMap[part.key];
         if (img && img.complete && img.naturalWidth > 0) {
-          ctx.drawImage(img, 0, 0, 256, 256);
+          if (colors[part.key]) {
+            // Colorisation de l'asset
+            const tempCtx = tempCanvas.getContext('2d');
+            if (tempCtx) {
+              tempCtx.clearRect(0, 0, 256, 256);
+              tempCtx.drawImage(img, 0, 0, 256, 256);
+              tempCtx.save();
+              tempCtx.globalAlpha = part.key === 'hairs' ? 0.6 : 0.5;
+              tempCtx.globalCompositeOperation = 'multiply';
+              tempCtx.fillStyle = colors[part.key];
+              tempCtx.fillRect(0, 0, 256, 256);
+              tempCtx.globalAlpha = 1.0;
+              tempCtx.globalCompositeOperation = 'destination-in';
+              tempCtx.drawImage(img, 0, 0, 256, 256);
+              tempCtx.globalCompositeOperation = 'source-over';
+              tempCtx.restore();
+              ctx.drawImage(tempCanvas, 0, 0, 256, 256);
+            }
+          } else {
+            ctx.drawImage(img, 0, 0, 256, 256);
+          }
         }
       });
       window.dispatchEvent(new Event('skin2d-ready'));
