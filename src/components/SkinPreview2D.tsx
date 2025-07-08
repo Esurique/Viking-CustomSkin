@@ -64,15 +64,6 @@ let tempCanvas: HTMLCanvasElement = document.createElement('canvas');
 tempCanvas.width = 256;
 tempCanvas.height = 256;
 
-// Fonction utilitaire pour choisir le mode de fusion avancé supporté
-function getSupportedBlendMode(ctx: CanvasRenderingContext2D, preferred: GlobalCompositeOperation, fallback: GlobalCompositeOperation): GlobalCompositeOperation {
-  ctx.save();
-  ctx.globalCompositeOperation = preferred;
-  const isSupported = ctx.globalCompositeOperation === preferred;
-  ctx.restore();
-  return isSupported ? preferred : fallback;
-}
-
 const SkinPreview2D: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { layers, colors, setLayer } = useSkinStore();
