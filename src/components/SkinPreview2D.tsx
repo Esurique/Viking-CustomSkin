@@ -77,208 +77,67 @@ const SkinPreview2D: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { layers, colors, setLayer } = useSkinStore();
 
+  // Ajout : dispatcher l'événement dès le montage pour le 3D
+  useEffect(() => {
+    window.dispatchEvent(new Event('skin2d-ready'));
+  }, []);
+
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
 
-    // Taille du skin Minecraft HD
     ctx.clearRect(0, 0, 256, 256);
-    ctx.globalCompositeOperation = "source-over" as GlobalCompositeOperation;
+    ctx.globalCompositeOperation = "source-over";
 
-    // Blend mode avancé pour la colorisation
-    const blendMode = getSupportedBlendMode(ctx, "overlay", "multiply") as GlobalCompositeOperation;
-
-    // 1. Dessiner steve.png comme base (en HD si dispo, sinon upscalé)
-    const steveUrl = new URL('../assets/steve.png', import.meta.url).href;
-    const baseSkin = imageCache['steve'] || new window.Image();
-    if (!imageCache['steve']) {
-      baseSkin.src = steveUrl;
-      imageCache['steve'] = baseSkin;
+    // Préparer toutes les images à charger (corps + accessoires)
+    const imagesToLoad: Promise<void>[] = [];
+    const imageMap: Record<string, HTMLImageElement> = {};
+    // Corps
+    const bodyIdx = PARTS.findIndex(p => p.key === 'body');
+    const bodyId = layers[bodyIdx];
+    const bodyOpts = partOptions['body'] || [];
+    const body = bodyOpts.find(opt => opt.id === bodyId) || bodyOpts[0];
+    if (body && body.img) {
+      imagesToLoad.push(new Promise(resolve => {
+        const img = new window.Image();
+        img.crossOrigin = "anonymous";
+        img.src = body.img;
+        img.onload = () => { imageMap['body'] = img; resolve(); };
+        img.onerror = () => resolve();
+      }));
     }
-    baseSkin.onload = () => {
-      ctx.drawImage(baseSkin, 0, 0, 256, 256);
-      // Appliquer la couleur de peau sur tout le skin avec une opacité de 0.7
-      if (colors.skin) {
-        ctx.save();
-        ctx.globalAlpha = 0.5;
-        ctx.globalCompositeOperation = blendMode as GlobalCompositeOperation;
-        ctx.fillStyle = colors.skin;
-        ctx.fillRect(0, 0, 256, 256);
-        ctx.globalAlpha = 1.0;
-        ctx.globalCompositeOperation = "source-over" as GlobalCompositeOperation;
-        ctx.restore();
-      }
-      // Les assets sont ajoutés APRÈS la peau, donc toujours au-dessus
-      let toLoad = 0;
-      let loaded = 0;
-      const onAssetLoaded = () => {
-        loaded++;
-        if (loaded === toLoad) {
-          window.dispatchEvent(new Event('skin2d-ready'));
-        }
-      };
-      PARTS.forEach((part, idx) => {
-        const selectedId = layers[idx];
-        const opts = partOptions[part.key] || [];
-        console.log(`[2D] PART: ${part.key}, idx: ${idx}, selectedId: ${selectedId}, opts:`, opts.map(o => o.id));
-        let selected = opts.find(opt => opt.id === selectedId) || opts[0];
-        // Correction auto : si l'ID n'existe pas, corriger le layer dans le state
-        if (opts.length > 0 && !opts.find(opt => opt.id === selectedId)) {
-          console.warn(`[2D] Correction: ID '${selectedId}' inexistant pour '${part.key}', fallback sur '${opts[0].id}'`);
-          setLayer(opts[0].id, idx);
-          selected = opts[0];
-        }
-        if (!selected || !selected.img) {
-          console.error(`[2D] Aucun asset sélectionné pour '${part.key}' (selectedId: ${selectedId})`);
-          return;
-        }
-        console.log(`[2D] Asset utilisé pour '${part.key}':`, selected.id, selected.img);
-        // Typage pour _variant
-        const selectedWithVariant = selected as typeof selected & { _variant?: string };
-        if (part.key === 'body') {
-          // Afficher l'asset du corps et appliquer la couleur de peau dessus
-          toLoad++;
-          const img = imageCache[selected.img] || new window.Image();
-          if (!imageCache[selected.img]) {
-            img.crossOrigin = "anonymous";
-            img.src = selected.img;
-            imageCache[selected.img] = img;
-          }
-          const drawBody = () => {
-            const tempCtx = tempCanvas.getContext('2d');
-            if (tempCtx) {
-              // 1. Dessiner l'asset du corps
-              tempCtx.clearRect(0, 0, 256, 256);
-              tempCtx.drawImage(img, 0, 0, 256, 256);
-
-              // 2. Sauvegarder l'alpha d'origine dans un autre canvas
-              const maskCanvas = document.createElement('canvas');
-              maskCanvas.width = 256;
-              maskCanvas.height = 256;
-              const maskCtx = maskCanvas.getContext('2d');
-              maskCtx && maskCtx.drawImage(img, 0, 0, 256, 256);
-
-              // 3. Teinter avec blendMode avancé
-              if (colors.skin) {
-                tempCtx.save();
-                tempCtx.globalAlpha = 0.60;
-                tempCtx.globalCompositeOperation = blendMode as GlobalCompositeOperation;
-                tempCtx.fillStyle = colors.skin;
-                tempCtx.fillRect(0, 0, 256, 256);
-                tempCtx.globalAlpha = 1.0;
-                tempCtx.globalCompositeOperation = 'source-over' as GlobalCompositeOperation;
-                tempCtx.restore();
-              }
-
-              // 4. Appliquer le masque alpha d'origine
-              tempCtx.save();
-              tempCtx.globalCompositeOperation = 'destination-in' as GlobalCompositeOperation;
-              tempCtx.drawImage(maskCanvas, 0, 0, 256, 256);
-              tempCtx.globalCompositeOperation = 'source-over' as GlobalCompositeOperation;
-              tempCtx.restore();
-
-              // 5. Dessiner sur le canvas principal
-              ctx.drawImage(tempCanvas, 0, 0, 256, 256);
-            }
-            onAssetLoaded();
-          };
-          img.onload = drawBody;
-          if (img.complete) drawBody();
-          img.onerror = onAssetLoaded;
-          return;
-        }
-        if (part.key === 'eyes') {
-          const variant = selectedWithVariant._variant || selectedWithVariant.id.replace('yeux', 'yeux');
-          const assets = yeuxAssets[variant] || yeuxAssets[Object.keys(yeuxAssets)[0]];
-          if (!assets) return;
-          let toLoadEyes = 3, loadedEyes = 0;
-          const onEyeLayerLoaded = () => {
-            loadedEyes++;
-            if (loadedEyes === toLoadEyes) onAssetLoaded();
-          };
-          // Pour chaque calque (paupiere, blanc, pupille)
-          ['paupiere','blanc','pupille'].forEach(key => {
-            const k = key as 'paupiere' | 'blanc' | 'pupille';
-            const img = imageCache[assets[k]] || new window.Image();
-            if (!imageCache[assets[k]]) {
-              img.crossOrigin = "anonymous";
-              img.src = assets[k];
-              imageCache[assets[k]] = img;
-            }
-            const drawEyeLayer = () => {
-              const tempCtx = tempCanvas.getContext('2d');
-              if (tempCtx) {
-                tempCtx.clearRect(0, 0, 256, 256);
-                tempCtx.drawImage(img, 0, 0, 256, 256);
-                if (colors[`eyes_${key}`]) {
-                  tempCtx.save();
-                  tempCtx.globalAlpha = 0.5;
-                  tempCtx.globalCompositeOperation = blendMode as GlobalCompositeOperation;
-                  tempCtx.fillStyle = colors[`eyes_${key}`];
-                  tempCtx.fillRect(0, 0, 256, 256);
-                  tempCtx.globalAlpha = 1.0;
-                  // Appliquer le masque alpha de l'asset
-                  tempCtx.globalCompositeOperation = 'destination-in' as GlobalCompositeOperation;
-                  tempCtx.drawImage(img, 0, 0, 256, 256);
-                  tempCtx.globalCompositeOperation = 'source-over' as GlobalCompositeOperation;
-                  tempCtx.restore();
-                }
-                ctx.drawImage(tempCanvas, 0, 0, 256, 256);
-              }
-              onEyeLayerLoaded();
-            };
-            img.onload = drawEyeLayer;
-            if (img.complete) drawEyeLayer();
-            img.onerror = onEyeLayerLoaded;
-          });
-          toLoad++; // pour la logique globale
-          return; // on ne fait pas le reste pour eyes
-        }
-        toLoad++;
-        const img = imageCache[selected.img] || new window.Image();
-        if (!imageCache[selected.img]) {
+    // Autres assets
+    PARTS.forEach((part, idx) => {
+      if (part.key === 'body') return;
+      const selectedId = layers[idx];
+      const opts = partOptions[part.key] || [];
+      const selected = opts.find(opt => opt.id === selectedId) || opts[0];
+      if (selected && selected.img) {
+        imagesToLoad.push(new Promise(resolve => {
+          const img = new window.Image();
           img.crossOrigin = "anonymous";
           img.src = selected.img;
-          imageCache[selected.img] = img;
+          img.onload = () => { imageMap[part.key] = img; resolve(); };
+          img.onerror = () => resolve();
+        }));
+      }
+    });
+    // Quand toutes les images sont prêtes, on dessine dans l'ordre
+    Promise.all(imagesToLoad).then(() => {
+      // Corps
+      if (imageMap['body'] && imageMap['body'].complete && imageMap['body'].naturalWidth > 0) {
+        ctx.drawImage(imageMap['body'], 0, 0, 256, 256);
+      }
+      // Autres assets
+      PARTS.forEach((part) => {
+        if (part.key === 'body') return;
+        const img = imageMap[part.key];
+        if (img && img.complete && img.naturalWidth > 0) {
+          ctx.drawImage(img, 0, 0, 256, 256);
         }
-        const drawAsset = () => {
-          // Canvas temporaire pour colorer uniquement l'asset
-          const tempCtx = tempCanvas.getContext('2d');
-          if (tempCtx) {
-            tempCtx.clearRect(0, 0, 256, 256);
-            tempCtx.drawImage(img, 0, 0, 256, 256);
-            if (colors[part.key]) {
-              tempCtx.save();
-              tempCtx.globalAlpha = part.key === 'hairs' ? 0.6 : 0.5;
-              tempCtx.globalCompositeOperation = blendMode as GlobalCompositeOperation;
-              tempCtx.fillStyle = colors[part.key];
-              tempCtx.fillRect(0, 0, 256, 256);
-              tempCtx.globalAlpha = 1.0;
-              // Appliquer le masque alpha de l'asset
-              tempCtx.globalCompositeOperation = 'destination-in' as GlobalCompositeOperation;
-              tempCtx.drawImage(img, 0, 0, 256, 256);
-              tempCtx.globalCompositeOperation = 'source-over' as GlobalCompositeOperation;
-              tempCtx.restore();
-            }
-            // Dessine le calque coloré sur le canvas principal
-            ctx.drawImage(tempCanvas, 0, 0, 256, 256);
-          }
-          onAssetLoaded();
-        };
-        img.onload = drawAsset;
-        if (img.complete) drawAsset();
-        img.onerror = onAssetLoaded;
       });
-      if (toLoad === 0) {
-        // Aucun asset à charger, skin prêt
-        window.dispatchEvent(new Event('skin2d-ready'));
-      }
-      // Sécurité : dispatcher toujours l'événement même si aucun asset n'est chargé
-      if (toLoad === 0) {
-        window.dispatchEvent(new Event('skin2d-ready'));
-      }
-    };
-    if (baseSkin.complete) baseSkin.onload && baseSkin.onload(null as any);
+      window.dispatchEvent(new Event('skin2d-ready'));
+    });
   }, [layers, colors, setLayer]);
 
   return (
